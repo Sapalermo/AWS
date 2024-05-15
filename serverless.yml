@@ -1,0 +1,43 @@
+service: test
+app: test
+org: 14901
+
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: python3.8
+  region: us-east-1
+  stage: dev
+
+functions:
+  createUser:
+    handler: handler.createUser
+    events:
+      - http:
+          path: user
+          method: post
+          cors: true
+  getUserById:
+    handler: handler.getUserById
+    events:
+      - http:
+          path: user/{id}
+          method: get
+          cors: true
+
+resources:
+  Resources:
+    UsersTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: Users
+        AttributeDefinitions:
+          - AttributeName: username
+            AttributeType: S
+        KeySchema:
+          - AttributeName: username
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
